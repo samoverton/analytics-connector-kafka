@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="Acunu Kafka Connector">
+    <property environment="env"/>
+    
+	<property name="connectors-src" location="connectors/src/main/java" />
+	
+    <condition property="jbird_lib" value="${env.JBIRD_HOME}/lib" else="../jbird.hg/build">
+	  <isset property="env.JBIRD_HOME"/>
+	</condition>
+	
+	<fileset dir="${jbird_lib}/" id="jbird-lib-fileset">
+		<include name="**/*.jar"/>
+	</fileset>
+	    
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    
+    <path id="Acunu Kafka Connector.classpath">
+		<pathelement location="build"/>
+		<fileset dir="lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset refid="jbird-lib-fileset" />
+    </path>
+    
+	<target name="jar" description="Create Jar file">
+		<jar jarfile="build/acunu-connector-kafka.jar" basedir="build" includes="**/*.class" />
+	</target>
+	
+    <target name="init">
+        <mkdir dir="build"/>
+        <copy includeemptydirs="false" todir="build">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+    
+    <target depends="clean" name="cleanall"/>
+    
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="build" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="Acunu Kafka Connector.classpath"/>
+        </javac>
+    </target>
+    
+</project>
