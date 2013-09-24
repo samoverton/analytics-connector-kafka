@@ -1,0 +1,20 @@
+syntax: glob
+*.class
+*~
+*.orig
+*.log
+*.results
+*.rej
+*.project
+.DS_Store
+\#*
+*/classes/*
+classes/*
+*.classpath
+*/.idea/*
+.idea
+*.iml
+*metastore_db*
+*/build/*
+build/*
+target/*
