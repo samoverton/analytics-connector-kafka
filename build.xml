@@ -24,7 +24,7 @@
 		<fileset refid="jbird-lib-fileset" />
     </path>
     
-	<target name="jar" description="Create Jar file">
+	<target name="jar" depends="build" description="Create Jar file">
 		<jar jarfile="build/acunu-connector-kafka.jar" basedir="build" includes="**/*.class" />
 	</target>
 	

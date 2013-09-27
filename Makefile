@@ -25,15 +25,16 @@ DEB_VERSION    = $(RELEASE).$(shell hg identify --num).$(shell hg identify --id)
 MAVEN_VERSION  = $(RELEASE).$(shell hg identify --num)
 UPLOAD_VERSION =
 
+.PHONY: all
 all: jar
 
-jar: build
+jar: 
 	ant jar
 
 ################################################################################
 install: install-jar
 
-install-jar:
+install-jar: jar
 	mkdir -p $(CONNECTOR_DIR)
 	mkdir -p $(CONNECTOR_LIB_DIR)
 	cp build/$(CONNECTOR_NAME).jar $(CONNECTOR_DIR)/
