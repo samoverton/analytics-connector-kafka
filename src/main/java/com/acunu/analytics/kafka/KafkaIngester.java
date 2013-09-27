@@ -10,7 +10,7 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.Message;
 
-import com.acunu.analytics.Config;
+import com.acunu.analytics.ConfigProperties;
 import com.acunu.analytics.Flow;
 import com.acunu.analytics.ingest.AbstractIngester;
 
@@ -42,13 +42,13 @@ public class KafkaIngester extends AbstractIngester {
 	 * @param aaConfig
 	 *            jBird config could be used by Ingester.
 	 */
-	public void init(Map<String, Object> ingesterProperties, Config aaConfig) {
+	public void init(ConfigProperties ingesterProperties, ConfigProperties aaConfig) {
 		super.init(ingesterProperties, aaConfig);
 
 		if (this.consumer == null) {
 			// Pull all properties directly from ingestor config
 			Properties props = new Properties();
-			props.putAll(ingesterProperties);
+			props.putAll(ingesterProperties.asMap());
 
 			// Create connection.
 			consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
