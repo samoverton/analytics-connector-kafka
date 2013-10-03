@@ -36,19 +36,16 @@ public class KafkaIngester extends AbstractIngester {
 	 * Initialize and start-up the Ingester. Even though, it has started, it
 	 * can't possibly serve any events unless some Flows are defined.
 	 * 
-	 * @param ingesterProperties
-	 *            Ingester specific properties
-	 * 
-	 * @param aaConfig
-	 *            jBird config could be used by Ingester.
+	 * @param config
+	 *            Merged config between AA and the ingester
 	 */
-	public void init(ConfigProperties ingesterProperties, ConfigProperties aaConfig) {
-		super.init(ingesterProperties, aaConfig);
+	public void init(String name, ConfigProperties config) {
+		super.init(name, config);
 
 		if (this.consumer == null) {
 			// Pull all properties directly from ingestor config
 			Properties props = new Properties();
-			props.putAll(ingesterProperties.asMap());
+			props.putAll(config.asMap());
 
 			// Create connection.
 			consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
