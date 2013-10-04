@@ -10,9 +10,14 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.Message;
 
-import com.acunu.analytics.ConfigProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.acunu.analytics.conf.ConfigProperties;
 import com.acunu.analytics.Flow;
+import com.acunu.analytics.Ingester;
 import com.acunu.analytics.ingest.AbstractIngester;
+import com.acunu.analytics.ingest.IngestException;
 
 /**
  * An Analytics ingester that acts as a Kafka consumer. Each "flow" (implemented
@@ -23,12 +28,19 @@ import com.acunu.analytics.ingest.AbstractIngester;
  * them on to the table or preprocessor specified in the flow.
  * 
  * TODO - would be nice to delay init until after all flows have been added.
- * TODO - callbacks on each batch to update 
+ * TODO - callbacks on each batch to update
  * 
  * @author tmoreton
  * 
  */
-public class KafkaIngester extends AbstractIngester {
+public class KafkaIngester extends AbstractIngester implements Ingester {
+
+	private Logger logger = LoggerFactory.getLogger(KafkaIngester.class);
+
+	/**
+	 * Timeout while waiting for messages.
+	 */
+	public static final int CONSUMER_ITERATOR_TIMEOUT = 1000;
 
 	private ConsumerConnector consumer;
 
@@ -36,20 +48,48 @@ public class KafkaIngester extends AbstractIngester {
 	 * Initialize and start-up the Ingester. Even though, it has started, it
 	 * can't possibly serve any events unless some Flows are defined.
 	 * 
-	 * @param config
-	 *            Merged config between AA and the ingester
+	 * @param name
+	 *            The ingester name
+	 * 
+	 * @param ingesterProperties
+	 *            Ingester properties, merged with AA properties
 	 */
-	public void init(String name, ConfigProperties config) {
+	@Override
+	public void init(String name, ConfigProperties config) throws IngestException {
+
+		assert consumer == null;
+
+		// Pull all properties directly from ingestor config, replacing
+		// underscores with dots.
+		final Properties kafkaProps = new Properties();
+		for (Map.Entry<String, Object> e : config.asMap().entrySet()) {
+			String key = e.getKey().replace('_', '.');
+			String value;
+			if (e.getValue() instanceof Number) {
+				value = e.getValue().toString();
+			} else if (e.getValue() instanceof String) {
+				value = (String) e.getValue();
+			} else {
+				throw new IngestException(String.format("Value for property %s must be a number or string", e.getKey()));
+			}
+			kafkaProps.setProperty(key, value);
+		}
+
+		// Check we have the required parameters.
+		for (String param : new String[] { "groupid", "zk.connect" }) {
+			if (!kafkaProps.containsKey(param))
+				throw new IngestException("Missing required parameter " + param.replace('.', '_'));
+		}
+
+		// Insert our own stuff into the properties.
+		kafkaProps.put("consumer.timeout.ms", String.valueOf(CONSUMER_ITERATOR_TIMEOUT));
+
 		super.init(name, config);
 
-		if (this.consumer == null) {
-			// Pull all properties directly from ingestor config
-			Properties props = new Properties();
-			props.putAll(config.asMap());
+		// Create connection.
+		consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(kafkaProps));
 
-			// Create connection.
-			consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-		}
+		logger.info("Created Kafka consumer: " + consumer.toString());
 	}
 
 	/**
@@ -85,6 +125,11 @@ public class KafkaIngester extends AbstractIngester {
 		topicCountMap.put(topic, new Integer(count));
 		Map<String, List<KafkaStream<Message>>> consumerMap = consumer.createMessageStreams(topicCountMap);
 		return consumerMap.get(topic);
+	}
+
+	@Override
+	public String toString() {
+		return "KafkaIngester " + getName();
 	}
 
 }

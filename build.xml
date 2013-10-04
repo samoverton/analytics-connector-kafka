@@ -2,10 +2,12 @@
 <project basedir="." default="build" name="Acunu Kafka Connector">
     <property environment="env"/>
     
-	<property name="connectors-src" location="connectors/src/main/java" />
-	
-    <condition property="jbird_lib" value="${env.JBIRD_HOME}/lib" else="../jbird.hg/build">
+    <condition property="jbird_lib" value="${env.JBIRD_HOME}/lib" else="../jbird.hg/lib">
 	  <isset property="env.JBIRD_HOME"/>
+	</condition>
+	
+    <condition property="jbird_connector_lib" value="${jbird_lib}/analytics-connectors.jar" else="${jbird_lib}/../build/analytics-connectors.jar">
+		 <available file="${jbird_lib}/analytics-connectors.jar"/>
 	</condition>
 	
 	<fileset dir="${jbird_lib}/" id="jbird-lib-fileset">
@@ -20,7 +22,9 @@
 		<pathelement location="build"/>
 		<fileset dir="lib">
 			<include name="**/*.jar"/>
+			<exclude name="analytics-connectors.jar" />
 		</fileset>
+		<fileset file="${jbird_connector_lib}" />
 		<fileset refid="jbird-lib-fileset" />
     </path>
     
