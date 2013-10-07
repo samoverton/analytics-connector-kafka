@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.acunu.analytics.conf.ConfigProperties;
 import com.acunu.analytics.Flow;
+import com.acunu.analytics.Context;
 import com.acunu.analytics.Ingester;
 import com.acunu.analytics.ingest.AbstractIngester;
 import com.acunu.analytics.ingest.IngestException;
@@ -33,7 +34,7 @@ import com.acunu.analytics.ingest.IngestException;
  * @author tmoreton
  * 
  */
-public class KafkaIngester extends AbstractIngester implements Ingester {
+public class KafkaIngester extends AbstractIngester {
 
 	private Logger logger = LoggerFactory.getLogger(KafkaIngester.class);
 
@@ -51,12 +52,11 @@ public class KafkaIngester extends AbstractIngester implements Ingester {
 	 * @param name
 	 *            The ingester name
 	 * 
-	 * @param ingesterProperties
-	 *            Ingester properties, merged with AA properties
+	 * @param context
+	 *            Execution context
 	 */
-	@Override
-	public void init(String name, ConfigProperties config) throws IngestException {
-
+	public KafkaIngester(String name, Context context) throws IngestException {
+		super(name, context);
 		assert consumer == null;
 
 		// Pull all properties directly from ingestor config, replacing
@@ -83,8 +83,6 @@ public class KafkaIngester extends AbstractIngester implements Ingester {
 
 		// Insert our own stuff into the properties.
 		kafkaProps.put("consumer.timeout.ms", String.valueOf(CONSUMER_ITERATOR_TIMEOUT));
-
-		super.init(name, config);
 
 		// Create connection.
 		consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(kafkaProps));
