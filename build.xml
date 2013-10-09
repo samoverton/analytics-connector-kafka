@@ -29,7 +29,7 @@
     </path>
     
 	<target name="jar" depends="build" description="Create Jar file">
-		<jar jarfile="build/acunu-connector-kafka.jar" basedir="build" includes="**/*.class" />
+		<jar jarfile="build/analytics-connector-kafka.jar" basedir="build" includes="**/*.class" />
 	</target>
 	
     <target name="init">

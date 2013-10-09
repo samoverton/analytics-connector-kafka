@@ -1,4 +1,4 @@
-CONNECTOR_NAME ?= acunu-connector-kafka
+CONNECTOR_NAME ?= analytics-connector-kafka
 
 # When installing in the product, these are overriden in the spec file
 JBIRD_HOME ?= /usr/share/acunu/jbird
