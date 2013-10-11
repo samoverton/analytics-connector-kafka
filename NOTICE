@@ -1,0 +1,22 @@
+Kafka connector for Acunu Analytics
+Copyright 2013 Acunu Ltd.
+
+This package bundles open-source software compiled into Java Archives (JAR).
+
+This repository includes Apache RAT 0.8, released under the Apache License,
+version 2.0 and packaged into apache-rat-0.8.jar, apache-rat-core-0.8,jar, and
+apache-rat-tasks-0.8.jar
+
+The connector makes use of compiled code from the Apache Commons project,
+packaged as commons-cli-1.2.jar, commons-collections-3.2.jar, and
+commons-compress-1.0.jar. These files are distributed under the Apache License
+version 2.0.
+
+Command line parsing is provided by jopt-simple packaged in jopt-simple-3.2.jar
+and distributed under the MIT license.
+
+Kafka integration is provided by kafka-0.7.2.jar, distributed under the Apache
+License version 2.0. Kafka makes use of Apache Zookeper, released under the
+Apache License version 2.0 in zkclient-0.1.jar and zookeper-3.3.4.jar.
+Kafka depends on scala-library.jar, built from kafka-0.7.2 and released under
+the Apache License version 2.0.
